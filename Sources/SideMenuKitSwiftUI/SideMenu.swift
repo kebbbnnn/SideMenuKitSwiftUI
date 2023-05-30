@@ -14,7 +14,7 @@ import SwiftUI
 
 public struct SMKSideMenu<Menu,Content, BottomView>: View where Menu: Hashable, Content: View, BottomView: View
 {
-  @State private var showsSidebar: Bool = false
+  @Binding private var showsSidebar: Bool
   @State private var selected: Menu
 
   private let configuration: SMKSideMenuConfiguration
@@ -22,8 +22,9 @@ public struct SMKSideMenu<Menu,Content, BottomView>: View where Menu: Hashable, 
   private let mainContent: (Menu) -> Content
   private let bottomView: () -> BottomView
 
-  public init(configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
+  public init(showsSidebar: Binding<Bool>, configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     self._selected = State(initialValue: startItem)
+    self._showsSidebar = showsSidebar
     self.configuration = configuration
     self.menuItems = menuItems
     self.mainContent = content
@@ -42,8 +43,9 @@ public struct SMKSideMenu<Menu,Content, BottomView>: View where Menu: Hashable, 
   }
 
   @available(iOS 16.0, *)
-  public init(navigationPath: Binding<NavigationPath>, configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
+  public init(showsSidebar: Binding<Bool>, navigationPath: Binding<NavigationPath>, configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     self._selected = State(initialValue: startItem)
+    self._showsSidebar = showsSidebar
     self.configuration = configuration
     self.menuItems = menuItems
     self.mainContent = content
@@ -125,7 +127,7 @@ struct SideMenu_Previews: PreviewProvider
 #endif
 
   static var previews: some View {
-    SMKSideMenu<Menu,ContentView, BottomView>(configuration: configuration, menuItems: items, startItem: .fine) {
+      SMKSideMenu<Menu,ContentView, BottomView>(showsSidebar: .constant(true), configuration: configuration, menuItems: items, startItem: .fine) {
       (menu) -> ContentView in
       ContentView(selected: menu, items: items)
     } bottomView: {

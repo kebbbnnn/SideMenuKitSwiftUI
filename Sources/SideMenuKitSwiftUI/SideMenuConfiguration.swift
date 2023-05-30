@@ -34,6 +34,14 @@ public struct SMKSideMenuConfiguration
   public var selectedColor: Color
 
   public var backgroundColor: Color
+    
+  public init(menuStyle: MenuStyle, sidebarWidth: CGFloat, selectedStyle: SelectedStyle, selectedColor: Color, backgroundColor: Color) {
+     self.menuStyle = menuStyle
+     self.sidebarWidth = sidebarWidth
+     self.selectedStyle = selectedStyle
+     self.selectedColor = selectedColor
+     self.backgroundColor = backgroundColor
+  }
 }
 
 extension SMKSideMenuConfiguration
