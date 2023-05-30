@@ -12,7 +12,7 @@
 
 import SwiftUI
 
-public struct SMKSlideMenu<Menu,Content>: View where Menu: Hashable, Content: View
+public struct SMKSlideMenu<Menu,Content, BottomView>: View where Menu: Hashable, Content: View, BottomView: View
 {
   @State private var showsSidebar: Bool = false
   @State private var selected: Menu
@@ -20,24 +20,26 @@ public struct SMKSlideMenu<Menu,Content>: View where Menu: Hashable, Content: Vi
   private let configuration: SMKSideMenuConfiguration
   private let menuItems: [SMKSideMenuItem<Menu>]
   private let mainContent: (Menu) -> Content
+private let bottomView: () -> BottomView
 
-  public init(configuration: SMKSideMenuConfiguration = .default, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content) {
+  public init(configuration: SMKSideMenuConfiguration = .default, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     self._selected = State(initialValue: startItem)
     self.configuration = configuration
     self.menuItems = menuItems
     self.mainContent = content
+    self.bottomView = bottomView
   }
 
-  public init(sidebarWidth: CGFloat, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content) {
+  public init(sidebarWidth: CGFloat, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     var configuration: SMKSideMenuConfiguration = .slide
     configuration.sidebarWidth = sidebarWidth
-    self.init(configuration: configuration, menuItems: menuItems, startItem: startItem, content: content)
+    self.init(configuration: configuration, menuItems: menuItems, startItem: startItem, content: content, bottomView: bottomView)
   }
 
   @ViewBuilder
   public var body: some View {
     SMKSlideMenuStack(sidebarWidth: configuration.sidebarWidth, showsSidebar: $showsSidebar) {
-      SlideMenuView<Menu>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, configuration: configuration)
+        SlideMenuView<Menu, BottomView>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, configuration: configuration, bottomView: self.bottomView)
         .frame(maxWidth: .infinity, alignment: .leading)
     } content: {
       mainContent(selected)
@@ -79,11 +81,21 @@ struct SlideMenu_Previews: PreviewProvider
   ].map({ SMKSideMenuItem<Menu>(title: $0.title, icon: $0.icon, tag: $0.tag) })
 
   static var previews: some View {
-    SMKSlideMenu<Menu,ContentView>(menuItems: items, startItem: Menu.profile) {
+    SMKSlideMenu<Menu,ContentView, BottomView>(menuItems: items, startItem: Menu.profile) {
       (menu) -> ContentView in
       ContentView(menu: menu)
+    } bottomView: {
+        BottomView()
     }
   }
+    
+    struct BottomView: View {
+        var body: some View {
+            ZStack {
+                Text("TEST")
+            }
+        }
+    }
 
   struct ContentView: View
   {

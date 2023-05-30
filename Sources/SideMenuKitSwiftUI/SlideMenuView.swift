@@ -12,7 +12,7 @@
 
 import SwiftUI
 
-struct SlideMenuView<Menu>: View where Menu: Hashable
+struct SlideMenuView<Menu, BottomView>: View where Menu: Hashable, BottomView: View
 {
   private let items: [SMKSideMenuItem<Menu>]
 
@@ -20,12 +20,14 @@ struct SlideMenuView<Menu>: View where Menu: Hashable
   @Binding private var showsSidebar: Bool
 
   private let configuration: SMKSideMenuConfiguration
+  private let bottomView: () -> BottomView
 
-  init(items: [SMKSideMenuItem<Menu>], selected: Binding<Menu>, showsSidebar: Binding<Bool>, configuration: SMKSideMenuConfiguration) {
+  init(items: [SMKSideMenuItem<Menu>], selected: Binding<Menu>, showsSidebar: Binding<Bool>, configuration: SMKSideMenuConfiguration, bottomView: @escaping () -> BottomView) {
     self.items = items
     self._selected = selected
     self._showsSidebar = showsSidebar
     self.configuration = configuration
+    self.bottomView = bottomView
   }
 
   @ViewBuilder
@@ -36,6 +38,7 @@ struct SlideMenuView<Menu>: View where Menu: Hashable
       }
       .padding(.top, 30.0)
       Spacer()
+      self.bottomView()
     }
     .padding()
     .padding(.top, 70.0)

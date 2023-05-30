@@ -12,27 +12,40 @@
 
 import SwiftUI
 
-struct SidebarMenuView<Menu>: View where Menu: Hashable
+struct SidebarMenuView<Menu, BottomView>: View where Menu: Hashable, BottomView: View
 {
   private let items: [SMKSideMenuItem<Menu>]
 
   @Binding private var selected: Menu
   @Binding private var showsSidebar: Bool
+    
+  private let bottomView: () -> BottomView
 
-  init(items: [SMKSideMenuItem<Menu>], selected: Binding<Menu>, showsSidebar: Binding<Bool>) {
+  init(items: [SMKSideMenuItem<Menu>], selected: Binding<Menu>, showsSidebar: Binding<Bool>, bottomView: @escaping () -> BottomView) {
     self.items = items
     self._selected = selected
     self._showsSidebar = showsSidebar
+    self.bottomView = bottomView
   }
 
   @ViewBuilder
   var body: some View {
-    ScrollView(showsIndicators: false) {
-      ForEach(items) { item in
-        SidebarMenuItem(item, selected: $selected, showsSidebar: $showsSidebar)
+      GeometryReader { geo in
+          ScrollView(showsIndicators: false) {
+              VStack {
+                  ForEach(items) { item in
+                      SidebarMenuItem(item, selected: $selected, showsSidebar: $showsSidebar)
+                  }
+                  
+                  Spacer()
+                  
+                  self.bottomView()
+              }
+              .frame(height: geo.size.height - 70)
+              .border(.red)
+          }
+          .padding(.top, 70.0)
+          .edgesIgnoringSafeArea(.all)
       }
-    }
-    .padding(.top, 70.0)
-    .edgesIgnoringSafeArea(.all)
   }
 }

@@ -12,7 +12,7 @@
 
 import SwiftUI
 
-public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: View
+public struct SMKSideMenu<Menu,Content, BottomView>: View where Menu: Hashable, Content: View, BottomView: View
 {
   @State private var showsSidebar: Bool = false
   @State private var selected: Menu
@@ -20,12 +20,14 @@ public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: Vie
   private let configuration: SMKSideMenuConfiguration
   private let menuItems: [SMKSideMenuItem<Menu>]
   private let mainContent: (Menu) -> Content
+  private let bottomView: () -> BottomView
 
-  public init(configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content) {
+  public init(configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     self._selected = State(initialValue: startItem)
     self.configuration = configuration
     self.menuItems = menuItems
     self.mainContent = content
+    self.bottomView = bottomView
   }
 
   private var _navigationPath: Any?
@@ -40,11 +42,12 @@ public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: Vie
   }
 
   @available(iOS 16.0, *)
-  public init(navigationPath: Binding<NavigationPath>, configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content) {
+  public init(navigationPath: Binding<NavigationPath>, configuration: SMKSideMenuConfiguration, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     self._selected = State(initialValue: startItem)
     self.configuration = configuration
     self.menuItems = menuItems
     self.mainContent = content
+    self.bottomView = bottomView
     self.navigationPath = navigationPath // XXX: Assign Last
   }
 
@@ -53,7 +56,7 @@ public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: Vie
       if configuration.menuStyle == .sidebar {
         if #available(iOS 16.0, *) {
           SMKSidebarMenuStack(navigationPath: navigationPath, sidebarWidth: configuration.sidebarWidth, showsSidebar: $showsSidebar) {
-            SidebarMenuView<Menu>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar)
+              SidebarMenuView<Menu, BottomView>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, bottomView: self.bottomView)
               .background(configuration.backgroundColor)
           } content: {
             mainContent(selected)
@@ -61,8 +64,8 @@ public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: Vie
         }
         else {
           SMKSidebarMenuStack(sidebarWidth: configuration.sidebarWidth, showsSidebar: $showsSidebar) {
-            SidebarMenuView<Menu>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar)
-              .background(configuration.backgroundColor)
+              SidebarMenuView<Menu, BottomView>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, bottomView: self.bottomView)
+            .background(configuration.backgroundColor)
           } content: {
             mainContent(selected)
           }
@@ -71,7 +74,7 @@ public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: Vie
       else {
         if #available(iOS 16.0, *) {
           SMKSlideMenuStack(navigationPath: navigationPath, sidebarWidth: configuration.sidebarWidth, showsSidebar: $showsSidebar) {
-            SlideMenuView<Menu>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, configuration: configuration)
+            SlideMenuView<Menu, BottomView>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, configuration: configuration, bottomView: self.bottomView)
               .background(configuration.backgroundColor)
           } content: {
             mainContent(selected)
@@ -79,7 +82,7 @@ public struct SMKSideMenu<Menu,Content>: View where Menu: Hashable, Content: Vie
         }
         else {
           SMKSlideMenuStack(sidebarWidth: configuration.sidebarWidth, showsSidebar: $showsSidebar) {
-            SlideMenuView<Menu>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, configuration: configuration)
+            SlideMenuView<Menu, BottomView>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, configuration: configuration, bottomView: self.bottomView)
               .background(configuration.backgroundColor)
           } content: {
             mainContent(selected)
@@ -122,12 +125,22 @@ struct SideMenu_Previews: PreviewProvider
 #endif
 
   static var previews: some View {
-    SMKSideMenu<Menu,ContentView>(configuration: configuration, menuItems: items, startItem: .fine) {
+    SMKSideMenu<Menu,ContentView, BottomView>(configuration: configuration, menuItems: items, startItem: .fine) {
       (menu) -> ContentView in
       ContentView(selected: menu, items: items)
+    } bottomView: {
+        BottomView()
     }
   }
 
+    struct BottomView: View {
+        var body: some View {
+            ZStack {
+                Text("TEST")
+            }
+        }
+    }
+    
   struct ContentView: View
   {
     @State private var showsAlert: Bool = false

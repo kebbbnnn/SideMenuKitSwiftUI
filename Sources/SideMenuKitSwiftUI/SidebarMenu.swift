@@ -13,7 +13,7 @@
 
 import SwiftUI
 
-public struct SMKSidebarMenu<Menu,Content>: View where Menu: Hashable, Content: View
+public struct SMKSidebarMenu<Menu,Content, BottomView>: View where Menu: Hashable, Content: View, BottomView: View
 {
   @State private var showsSidebar: Bool = false
   @State private var selected: Menu
@@ -21,17 +21,19 @@ public struct SMKSidebarMenu<Menu,Content>: View where Menu: Hashable, Content: 
   private let configuration: SMKSideMenuConfiguration
   private let menuItems: [SMKSideMenuItem<Menu>]
   private let mainContent: (Menu) -> Content
+  private let bottomView: () -> BottomView
 
-  public init(configuration: SMKSideMenuConfiguration = .sidebar, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content) {
+  public init(configuration: SMKSideMenuConfiguration = .sidebar, menuItems: [SMKSideMenuItem<Menu>], startItem: Menu, @ViewBuilder content: @escaping (Menu) -> Content, bottomView: @escaping () -> BottomView) {
     self._selected = State(initialValue: startItem)
     self.configuration = configuration
     self.menuItems = menuItems
     self.mainContent = content
+    self.bottomView = bottomView
   }
 
   public var body: some View {
     SMKSidebarMenuStack(sidebarWidth: configuration.sidebarWidth, showsSidebar: $showsSidebar) {
-      SidebarMenuView<Menu>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar)
+        SidebarMenuView<Menu, BottomView>(items: menuItems, selected: $selected, showsSidebar: $showsSidebar, bottomView: self.bottomView)
         .background(configuration.backgroundColor)
     } content: {
       mainContent(selected)
@@ -65,10 +67,20 @@ struct SidebarMenu_Previews: PreviewProvider
   ].map({ SMKSideMenuItem<Menu>(title: $0.title, icon: $0.icon, tag: $0.tag, color: $0.color) })
 
   static var previews: some View {
-    SMKSidebarMenu<Menu,ContentView>(menuItems: items, startItem: .fine) {
+    SMKSidebarMenu<Menu,ContentView, BottomView>(menuItems: items, startItem: .fine) {
       (menu) -> ContentView in
       ContentView(selected: menu, items: items)
+    } bottomView: {
+        BottomView()
     }
+  }
+    
+  struct BottomView: View {
+      var body: some View {
+          ZStack {
+              Text("TEST")
+          }
+      }
   }
 
   struct ContentView: View
