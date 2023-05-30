@@ -42,7 +42,6 @@ struct SidebarMenuView<Menu, BottomView>: View where Menu: Hashable, BottomView:
                   self.bottomView()
               }
               .frame(height: geo.size.height - 70)
-              .border(.red)
           }
           .padding(.top, 70.0)
           .edgesIgnoringSafeArea(.all)

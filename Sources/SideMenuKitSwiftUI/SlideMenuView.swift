@@ -36,7 +36,7 @@ struct SlideMenuView<Menu, BottomView>: View where Menu: Hashable, BottomView: V
       ForEach(items) { item in
         SlideMenuItem(item, configuration: configuration, selected: $selected, showsSidebar: $showsSidebar)
       }
-      .padding(.top, 30.0)
+      .padding(.top, self.configuration.spacing)
       Spacer()
       self.bottomView()
     }

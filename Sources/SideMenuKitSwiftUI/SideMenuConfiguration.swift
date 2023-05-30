@@ -22,6 +22,7 @@ public struct SMKSideMenuConfiguration
   public var menuStyle: MenuStyle
 
   public var sidebarWidth: CGFloat
+  public var spacing: CGFloat
 
   public enum SelectedStyle
   {
@@ -35,9 +36,10 @@ public struct SMKSideMenuConfiguration
 
   public var backgroundColor: Color
     
-  public init(menuStyle: MenuStyle, sidebarWidth: CGFloat, selectedStyle: SelectedStyle, selectedColor: Color, backgroundColor: Color) {
+  public init(menuStyle: MenuStyle, sidebarWidth: CGFloat, spacing: CGFloat, selectedStyle: SelectedStyle, selectedColor: Color, backgroundColor: Color) {
      self.menuStyle = menuStyle
      self.sidebarWidth = sidebarWidth
+     self.spacing = spacing
      self.selectedStyle = selectedStyle
      self.selectedColor = selectedColor
      self.backgroundColor = backgroundColor
@@ -50,6 +52,7 @@ extension SMKSideMenuConfiguration
     SMKSideMenuConfiguration(
       menuStyle: .slide,
       sidebarWidth: 240,
+      spacing: 30,
       selectedStyle: .highlight,
       selectedColor: .pink,
       backgroundColor: .init(red: 32/255, green: 32/255, blue: 32/255)
@@ -60,6 +63,7 @@ extension SMKSideMenuConfiguration
     SMKSideMenuConfiguration(
       menuStyle: .slide,
       sidebarWidth: 160,
+      spacing: 30,
       selectedStyle: .pinpoint,
       selectedColor: .pink,
       backgroundColor: .init(red: 32/255, green: 32/255, blue: 32/255)
@@ -70,6 +74,7 @@ extension SMKSideMenuConfiguration
     SMKSideMenuConfiguration(
       menuStyle: .sidebar,
       sidebarWidth: 80,
+      spacing: 0,
       selectedStyle: .none,
       selectedColor: .pink,
       backgroundColor: .init(red: 32/255, green: 32/255, blue: 32/255)
